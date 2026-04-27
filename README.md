@@ -196,4 +196,8 @@ vercel
 
 ## Licencia
 
-Uso interno — Institución Educativa La Gabriela.
+Copyright © 2026 **Alejandro Pacheco Sepúlveda** — [Prydox Company](https://github.com/imPachecow)
+
+Este software es de uso exclusivo para la Institución Educativa La Gabriela. Queda prohibida su copia, distribución o uso comercial sin autorización expresa del autor.
+
+Ver el archivo [`LICENSE`](./LICENSE) para más detalles.
