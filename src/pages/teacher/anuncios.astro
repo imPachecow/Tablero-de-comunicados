@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { createSupabaseServerClient } from '../../lib/supabase';
+import { requireTeacher } from '../../lib/auth';
+import AnnouncementsPanel from '../../components/teacher/AnnouncementsPanel';
+
+const supabase = createSupabaseServerClient(Astro.request, Astro.cookies);
+const result = await requireTeacher(supabase);
+if ('redirect' in result) return Astro.redirect(result.redirect);
+const { profile } = result;
+
+const [{ data: groups }, { data: announcements }] = await Promise.all([
+  supabase
+    .from('groups')
+    .select('id, name, teacher_id, description, created_at')
+    .eq('teacher_id', profile.id)
+    .order('name'),
+  supabase
+    .from('announcements')
+    .select('*, attachments:announcement_attachments(*)')
+    .eq('teacher_id', profile.id)
+    .order('pinned',    { ascending: false })
+    .order('important', { ascending: false })
+    .order('created_at', { ascending: false }),
+]);
+---
+
+<BaseLayout title="Anuncios" teacherNav={true} teacherName={profile.full_name}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Anuncios</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Publica comunicados para uno o varios grupos. Los estudiantes los ven al entrar a su grupo.
+      </p>
+    </div>
+
+    <AnnouncementsPanel
+      initialAnnouncements={announcements ?? []}
+      groups={groups ?? []}
+      client:load
+    />
+
+  </div>
+</BaseLayout>

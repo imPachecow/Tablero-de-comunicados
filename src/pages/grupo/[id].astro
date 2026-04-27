@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AnnouncementFeed from '../../components/AnnouncementFeed';
+import { createSupabaseServerClient } from '../../lib/supabase';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/');
+
+const supabase = createSupabaseServerClient(Astro.request, Astro.cookies);
+
+const { data: group } = await supabase
+  .from('groups')
+  .select('id, name, description')
+  .eq('id', id)
+  .single();
+
+if (!group) return Astro.redirect('/');
+
+// Solo mostrar anuncios publicados (scheduled_at nulo o pasado)
+const now = new Date().toISOString();
+const { data: announcements } = await supabase
+  .from('announcements')
+  .select('*, attachments:announcement_attachments(*)')
+  .contains('group_ids', [id])
+  .or(`scheduled_at.is.null,scheduled_at.lte.${now}`)
+  .order('pinned',      { ascending: false })
+  .order('important',   { ascending: false })
+  .order('created_at',  { ascending: false });
+---
+
+<BaseLayout title={group.name}>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- Breadcrumb -->
+    <div class="flex items-center justify-between mb-6">
+      <a href="/" data-clear-group
+        class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700 group">
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Cambiar grupo
+      </a>
+      <button id="btn-change-role"
+        class="text-xs text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-2">
+        Cambiar perfil
+      </button>
+    </div>
+
+    <!-- Encabezado del grupo -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">{group.name}</h1>
+      {group.description && (
+        <p class="text-gray-500 mt-1">{group.description}</p>
+      )}
+    </div>
+
+    <!-- Feed interactivo (filtros + no leídos) -->
+    <AnnouncementFeed
+      announcements={announcements ?? []}
+      groupId={id}
+      client:load
+    />
+
+  </div>
+</BaseLayout>
+
+<script is:inline define:vars={{ groupId: group.id }}>
+  // Persistir grupo seleccionado
+  localStorage.setItem('lg_group', groupId);
+
+  // "Cambiar grupo" limpia el grupo guardado (mantiene el rol)
+  document.querySelector('[data-clear-group]')?.addEventListener('click', () => {
+    localStorage.removeItem('lg_group');
+  });
+
+  // "Cambiar perfil" limpia rol y grupo → vuelve a la landing
+  document.getElementById('btn-change-role')?.addEventListener('click', () => {
+    localStorage.removeItem('lg_role');
+    localStorage.removeItem('lg_group');
+    window.location.href = '/';
+  });
+</script>

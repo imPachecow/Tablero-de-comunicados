@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Keyframes fuera de @layer para compatibilidad total */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+
+  /* Tarjeta base */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-5;
+  }
+
+  /* Inputs y selects */
+  .input {
+    @apply block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900
+           placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1
+           focus:ring-primary-500 transition-colors;
+  }
+
+  .input:disabled {
+    @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+  }
+
+  /* Botón primario */
+  .btn-primary {
+    @apply inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm
+           font-medium rounded-lg hover:bg-primary-700
+           transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Botón secundario */
+  .btn-secondary {
+    @apply inline-flex items-center gap-1.5 px-4 py-2 bg-white text-gray-700 text-sm
+           font-medium rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-300
+           transition-colors;
+  }
+
+  /* Botón de peligro (eliminar) */
+  .btn-danger {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 text-sm
+           font-medium rounded-lg border border-red-200 hover:bg-red-100 hover:border-red-300
+           transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Nav links */
+  .nav-link {
+    @apply text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-md
+           hover:bg-gray-100 transition-colors;
+  }
+
+  .nav-link.active {
+    @apply text-primary-600 bg-primary-50;
+  }
+
+  /* Contenido HTML enriquecido de los anuncios */
+  .rich-content p          { @apply mb-3 last:mb-0; }
+  .rich-content strong,
+  .rich-content b          { @apply font-semibold; }
+  .rich-content em,
+  .rich-content i          { @apply italic; }
+  .rich-content u          { @apply underline; }
+  .rich-content ul         { @apply list-disc list-inside mb-3 space-y-1; }
+  .rich-content ol         { @apply list-decimal list-inside mb-3 space-y-1; }
+  .rich-content li         { @apply text-gray-700; }
+  .rich-content h2         { @apply text-lg font-semibold text-gray-900 mb-2 mt-4 first:mt-0; }
+  .rich-content h3         { @apply text-base font-semibold text-gray-900 mb-2 mt-3 first:mt-0; }
+  .rich-content a          { @apply text-primary-600 underline; }
+  .rich-content a:hover    { color: #1e40af; }
+  .rich-content div        { @apply mb-1; }
+
+  /* ── Animaciones de entrada ──────────────────────────── */
+  .anim-fade-in {
+    animation: fadeIn 0.28s ease-out both;
+  }
+
+  .anim-enter         { animation: fadeInUp 0.32s ease-out both; }
+  .anim-enter-d1      { animation: fadeInUp 0.32s 0.07s  ease-out both; }
+  .anim-enter-d2      { animation: fadeInUp 0.32s 0.13s  ease-out both; }
+  .anim-enter-d3      { animation: fadeInUp 0.32s 0.19s  ease-out both; }
+  .anim-enter-d4      { animation: fadeInUp 0.32s 0.25s  ease-out both; }
+  .anim-enter-d5      { animation: fadeInUp 0.32s 0.31s  ease-out both; }
+
+  /* Editor contenteditable placeholder */
+  .editor-area:empty:before {
+    content: attr(data-placeholder);
+    @apply text-gray-400 pointer-events-none;
+  }
+}

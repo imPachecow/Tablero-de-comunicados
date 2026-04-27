@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { createSupabaseServerClient } from '../../lib/supabase';
+import { requireTeacher } from '../../lib/auth';
+import GroupManager from '../../components/teacher/GroupManager';
+
+const supabase = createSupabaseServerClient(Astro.request, Astro.cookies);
+const result = await requireTeacher(supabase);
+if ('redirect' in result) return Astro.redirect(result.redirect);
+const { profile } = result;
+
+const { data: groups } = await supabase
+  .from('groups')
+  .select('id, name, description, teacher_id, created_at')
+  .eq('teacher_id', profile.id)
+  .order('name');
+---
+
+<BaseLayout title="Grupos" teacherNav={true} teacherName={profile.full_name}>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Grupos</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Administra los grupos de tu institución. Los estudiantes los verán en el tablero principal.
+      </p>
+    </div>
+
+    <GroupManager
+      initialGroups={groups ?? []}
+      teacherId={profile.id}
+      client:load
+    />
+
+  </div>
+</BaseLayout>
