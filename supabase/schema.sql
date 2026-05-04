@@ -40,9 +40,11 @@ CREATE TABLE IF NOT EXISTS public.announcements (
   content    TEXT NOT NULL,        -- contenido HTML enriquecido
   group_ids  UUID[] NOT NULL DEFAULT '{}', -- grupos destinatarios
   teacher_id UUID NOT NULL REFERENCES public.profiles(id),
-  pinned     BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  pinned       BOOLEAN DEFAULT false,
+  important    BOOLEAN DEFAULT false,
+  scheduled_at TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- =====================================================

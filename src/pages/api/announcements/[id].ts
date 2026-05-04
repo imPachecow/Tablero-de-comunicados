@@ -46,11 +46,12 @@ export const PUT: APIRoute = async ({ request, cookies, params }) => {
     });
   }
 
-  // Eliminar adjuntos quitados
+  // Eliminar adjuntos quitados (scope restringido al anuncio actual)
   if (Array.isArray(removedAttachmentIds) && removedAttachmentIds.length > 0) {
     await supabase
       .from('announcement_attachments')
       .delete()
+      .eq('announcement_id', params.id!)
       .in('id', removedAttachmentIds);
   }
 
